@@ -7,6 +7,11 @@ from pandasai.llm import OpenAI
 import streamlit as st
 import pandas as pd
 import os
+
+from langchain.agents import AgentType
+from langchain.agents import create_pandas_dataframe_agent
+from langchain.callbacks.streamlit import StreamlitCallbackHandler
+from langchain.chat_models import ChatOpenAI
 # from pandasai_app.components.faq import faq
 
 def faq():
@@ -72,8 +77,8 @@ def load_data(uploaded_file):
         return None
 
 
-st.set_page_config(page_title="PandasAI ", page_icon="🐼")
-st.title("🐼 PandasAI: Chat with CSV")
+st.set_page_config(page_title="Chat-Data", page_icon="🦜|🐼")
+st.title("🐼 | 🦜 Chat with Data")
 
 uploaded_file = st.file_uploader(
     "Upload a Data file",
@@ -89,14 +94,17 @@ openai_api_key = st.sidebar.text_input("OpenAI API Key",
                                         type="password",
                                         placeholder="Paste your OpenAI API key here (sk-...)")
 
+chat_data = st.sidebar.selectbox("Choose a Backend", ['pandasai', 'langchain'])
+
 with st.sidebar:
         st.markdown("---")
         st.markdown(
             "## How to use\n"
             "1. Enter your [OpenAI API key](https://platform.openai.com/account/api-keys) below🔑\n"  # noqa: E501
-            "2. Upload a csv file with data📄\n"
-            "3. A csv file is read as Pandas Dataframe📄\n"
-            "4. Ask a question about to make dataframe conversational💬\n"
+            "2. Choose Backend PandasAI or LangChain\n"
+            "3. Upload a csv file with data📄\n"
+            "4. A csv file is read as Pandas Dataframe📄\n"
+            "5. Ask a question about to make dataframe conversational💬\n"
         )
 
         st.markdown("---")
@@ -128,17 +136,37 @@ if prompt := st.chat_input(placeholder="What is this data about?"):
     if not openai_api_key:
         st.info("Please add your OpenAI API key to continue.")
         st.stop()
+    if chat_data == "pandasai":
+        #PandasAI OpenAI Model
+        llm = OpenAI(api_token=openai_api_key)
+        # llm = OpenAI(api_token=openai_api_key)
 
-    #PandasAI OpenAI Model
-    llm = OpenAI(api_token=openai_api_key)
-    # llm = OpenAI(api_token=openai_api_key)
+        sdf = SmartDataframe(df, config = {"llm": llm,
+                                            "enable_cache": False,
+                                            "conversational": True,
+                                            "callback": StdoutCallback()})
 
-    sdf = SmartDataframe(df, config = {"llm": llm,
-                                        "enable_cache": False,
-                                        "conversational": True,
-                                        "callback": StdoutCallback()})
+        with st.chat_message("assistant"):
+            response = sdf.chat(st.session_state.messages)
+            st.session_state.messages.append({"role": "assistant", "content": response})
+            st.write(response)
+    
+    if chat_data == "langchain":
 
-    with st.chat_message("assistant"):
-        response = sdf.chat(st.session_state.messages)
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        st.write(response)
+        llm = ChatOpenAI(
+            temperature=0, model="gpt-3.5-turbo-0613", openai_api_key=openai_api_key, streaming=True
+        )
+
+        pandas_df_agent = create_pandas_dataframe_agent(
+            llm,
+            df,
+            verbose=True,
+            agent_type=AgentType.OPENAI_FUNCTIONS,
+            handle_parsing_errors=True,
+        )
+
+        with st.chat_message("assistant"):
+            st_cb = StreamlitCallbackHandler(st.container(), expand_new_thoughts=False)
+            response = pandas_df_agent.run(st.session_state.messages, callbacks=[st_cb])
+            st.session_state.messages.append({"role": "assistant", "content": response})
+            st.write(response)
