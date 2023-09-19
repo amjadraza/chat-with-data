@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "pandasai-app"
+name = "chat-with-data"
 version = "1.0.0"
 description = "An app to have conversational pandas dataframes"
 authors = ["Datafy Associates <info@datafyassociates.com>"]
@@ -9,13 +9,16 @@ packages = [{include = "pandasai_app"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-streamlit = ">=1.25"
+streamlit = ">=1.26"
+pandasai = {version = ">=1.2"}
 faiss-cpu = "^1.7.3"
 pillow = "^9.4.0"
 tenacity = "^8.2.0"
-pandasai = "^1.0.9"
 tabulate = "^0.9.0"
 beautifulsoup4 = "^4.12.2"
+jupyterlab = "^4.0.3"
+langchain =  {extras = ["docarray"], version = "^0.0.279"}
+
 
 
 [tool.poetry.group.dev.dependencies]
