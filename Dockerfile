@@ -1,20 +1,55 @@
-FROM python:3.10-slim-bullseye
+# The builder image, used to build the virtual environment
+FROM python:3.11-slim-buster as builder
 
-ENV HOST=0.0.0.0
-
-ENV LISTEN_PORT 8501
-
-EXPOSE 8501
+# Environment setup for build
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/home/appuser/.local/bin:${PATH}" \
+    POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_IN_PROJECT=1 \
+    POETRY_VIRTUALENVS_CREATE=1 \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
 
 RUN apt-get update && apt-get install -y git
+RUN apt install -y build-essential
 
-COPY ./requirements.txt /app/requirements.txt
+RUN groupadd -g 1001 appgroup && \
+    adduser --uid 1001 --gid 1001 --disabled-password --gecos '' appuser
 
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+USER 1001
 
-WORKDIR app/
+RUN pip install --user --no-cache-dir --upgrade pip && \
+    pip install --user --no-cache-dir poetry==1.4.2
 
-COPY ./pandasai_app /app/pandasai_app
-COPY ./.streamlit /app/.streamlit
+WORKDIR /home/appuser/app/
+COPY pyproject.toml poetry.lock /home/appuser/app/
+RUN poetry install --no-cache --no-root && \
+    rm -rf $POETRY_CACHE_DIR
 
-CMD ["streamlit", "run", "pandasai_app/main.py"]
+# The runtime image, used to just run the code provided its virtual environment
+FROM python:3.11-slim-buster as runtime
+
+# Environment setup for runtime
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    VIRTUAL_ENV=/home/appuser/app/.venv \
+    PATH="/home/appuser/app/.venv/bin:/home/appuser/.local/bin:$PATH" \
+    HOST=0.0.0.0 \
+    LISTEN_PORT=8000
+
+RUN groupadd -g 1001 appgroup && \
+    adduser --uid 1001 --gid 1001 --disabled-password --gecos '' appuser
+
+USER 1001
+EXPOSE 8000
+WORKDIR /home/appuser/app/
+
+# Copy virtual environment from builder
+COPY --chown=1001:1001 --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+
+# Copy application files
+COPY --chown=1001:1001 .streamlit /home/appuser/app/.streamlit
+COPY ./demo_apps /home/appuser/app/demo_apps
+
+CMD ["streamlit", "run", "/home/appuser/app/demo_app/pandasai_app.py"]
+

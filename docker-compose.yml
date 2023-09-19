@@ -1,10 +1,9 @@
 version: '3'
 services:
-  pandasai-app:
-    image: pandasai-app
-    build: ./app
-    command: streamlit run pandasai_app/main.py
-    volumes:
-      - ./pandasai_app/:/app/pandasai_app
+  chat-with-data:
+    image: chat-with-data:latest
+    build: .
     ports:
-      - 8501:8501
+    - 8000:8000
+    working_dir: /home/appuser/app/
+    command: ["streamlit", "run", "/home/appuser/app/demo_apps/pandasai_app.py"]

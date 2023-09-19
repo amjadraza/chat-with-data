@@ -8,7 +8,7 @@ readme = "README.md"
 packages = [{include = "pandasai_app"}]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.10,<4.0"
 streamlit = ">=1.26"
 pandasai = {version = ">=1.2"}
 faiss-cpu = "^1.7.3"
@@ -17,7 +17,8 @@ tenacity = "^8.2.0"
 tabulate = "^0.9.0"
 beautifulsoup4 = "^4.12.2"
 jupyterlab = "^4.0.3"
-langchain =  {extras = ["docarray"], version = "^0.0.279"}
+langchain =  {extras = ["docarray"], version = "^0.0.294"}
+hnswlib = "^0.7.0"
 
 
 
