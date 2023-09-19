@@ -6,4 +6,4 @@ services:
     ports:
     - 8000:8000
     working_dir: /home/appuser/app/
-    command: ["streamlit", "run", "/home/appuser/app/demo_apps/pandasai_app.py"]
+    command: ["streamlit", "run", "/home/appuser/app/demo_apps/main.py"]

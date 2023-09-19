@@ -51,5 +51,5 @@ COPY --chown=1001:1001 --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY --chown=1001:1001 .streamlit /home/appuser/app/.streamlit
 COPY ./demo_apps /home/appuser/app/demo_apps
 
-CMD ["streamlit", "run", "/home/appuser/app/demo_app/pandasai_app.py"]
+CMD ["streamlit", "run", "/home/appuser/app/demo_app/main.py"]
 
