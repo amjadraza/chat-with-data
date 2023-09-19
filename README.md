@@ -60,18 +60,18 @@ Deploy App on Streamlit Public Cloud
 
 Belo are the steps to deploy a Streamlit App on Streamlit Public Cloud
 
-## 1. Create a Streamlit App:
+1. Create a Streamlit App:
 Develop your Streamlit app and ensure it's working as expected on your local machine.
 
-## 2. Push to GitHub:
+2. Push to GitHub:
 Upload your Streamlit app code to a GitHub repository if it's not already there. Make sure to include all necessary files and dependencies.
-## 3. Connect to Streamlit Sharing:
+3. Connect to Streamlit Sharing:
 Visit Streamlit Sharing and sign in with your GitHub account.
 
-## 4. Select Repository:
+4. Select Repository:
 Click on "New App" and select your GitHub repository containing the Streamlit app.
 
-## 5. Deploy Your App:
+5. Deploy Your App:
 Streamlit Sharing will automatically detect your app's settings. Click "Deploy" to start the deployment process. Once complete, you'll receive a public URL to access your Streamlit app.
 
 
