@@ -1,5 +1,5 @@
 # The builder image, used to build the virtual environment
-FROM python:3.11-slim-buster as builder
+FROM python:3.11-buster as builder
 
 # Environment setup for build
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -27,7 +27,7 @@ RUN poetry install --no-cache --no-root && \
     rm -rf $POETRY_CACHE_DIR
 
 # The runtime image, used to just run the code provided its virtual environment
-FROM python:3.11-slim-buster as runtime
+FROM python:3.11-buster as runtime
 
 # Environment setup for runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -49,7 +49,7 @@ COPY --chown=1001:1001 --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 # Copy application files
 COPY --chown=1001:1001 .streamlit /home/appuser/app/.streamlit
-COPY ./demo_apps /home/appuser/app/demo_apps
+COPY ./demo_apps /home/appuser/app/demo_apps/
 
-CMD ["streamlit", "run", "/home/appuser/app/demo_app/main.py"]
+CMD ["streamlit", "run", "/home/appuser/app/demo_apps/main.py"]
 

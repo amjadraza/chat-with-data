@@ -1,3 +1,4 @@
 [server]
 maxUploadSize = 15
 runOnSave = true
+port = 8000
