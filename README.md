@@ -93,9 +93,23 @@ we are going to use `Dockerfile` to deploy the app using Google Cloud Run.
 
 1. Initialise & Configure the Google Project using Command Prompt
 
-`gcloud app create --project=[YOUR_PROJECT_ID]`
+- gcloud init
+- gcloud auth login 
 
-2. Enable Services for the Project
+# YOUR_PROJECT_ID = "datafy-chat-app"
+
+- Create a project on GCP using below command
+
+`gcloud projects create datafy-chat-app --name="Chat App" --labels=type=workshop`
+
+gcloud config set project datafy-chat-app
+
+gcloud config set compute/zone australia-southeast1
+
+gcloud config list compute/zone
+
+
+2. Enable Services for the Project Cloudbuild
 
 ```
 gcloud services enable cloudbuild.googleapis.com
@@ -104,36 +118,39 @@ gcloud services enable run.googleapis.com
 
 3. Create Service Account
 
-```
-gcloud iam service-accounts create langchain-app-cr \
-    --display-name="langchain-app-cr"
+We have to create a service account to be able to provide acess
 
-gcloud projects add-iam-policy-binding langchain-chat \
-    --member="serviceAccount:langchain-app-cr@langchain-chat.iam.gserviceaccount.com" \
+chat-app-tutorial
+
+```
+gcloud iam service-accounts create sa-chat-app-tutorial --display-name="chat-app-tutorial"
+
+gcloud projects add-iam-policy-binding datafy-chat-app\
+    --member="serviceAccount:sa-chat-app-tutorial@datafy-chat-app.iam.gserviceaccount.com" \
     --role="roles/run.invoker"
 
-gcloud projects add-iam-policy-binding langchain-chat \
-    --member="serviceAccount:langchain-app-cr@langchain-chat.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding datafy-chat-app \
+    --member="serviceAccount:sa-chat-app-tutorial@datafy-chat-app.iam.gserviceaccount.com" \
     --role="roles/serviceusage.serviceUsageConsumer"
 
-gcloud projects add-iam-policy-binding langchain-chat \
-    --member="serviceAccount:langchain-app-cr@langchain-chat.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding datafy-chat-app \
+    --member="serviceAccount:sa-chat-app-tutorial@datafy-chat-app.iam.gserviceaccount.com" \
     --role="roles/run.admin"
 ``` 
 
 4. Generate the Docker
 
-`DOCKER_BUILDKIT=1 docker build --target=runtime . -t australia-southeast1-docker.pkg.dev/langchain-chat/clapp/langchain-chainlit-chat-app:latest`
+`DOCKER_BUILDKIT=1 docker build --target=runtime . -t australia-southeast1-docker.pkg.dev/datafy-chat-app/datachatapp/chat-with-data:latest`
 
 5. Push Image to Google Artifact's Registry
 
-Create the repository with name `clapp`
+Create the repository with name `datachatapp`
 
 ```
-gcloud artifacts repositories create clapp \
+gcloud artifacts repositories create datachatapp \
     --repository-format=docker \
     --location=australia-southeast1 \
-    --description="A Langachain Chainlit App" \
+    --description="A Chat with Data App" \
     --async
 ```
 
@@ -151,16 +168,16 @@ Check the artifacts locations
 
 Once ready, let us push the image to location
 
-`docker push australia-southeast1-docker.pkg.dev/langchain-chat/clapp/langchain-chainlit-chat-app:latest`
+`docker push australia-southeast1-docker.pkg.dev/datafy-chat-app/datachatapp/chat-with-data:latest`
 
 6. Deploy using Cloud Run
 
 Once image is pushed to Google Cloud Artifacts Registry. Let us deploy the image.
 
 ```
-gcloud run deploy langchain-chat-app --image=australia-southeast1-docker.pkg.dev/langchain-chat/clapp/langchain-chainlit-chat-app:latest \
+gcloud run deploy chat-data-llm --image=australia-southeast1-docker.pkg.dev/datafy-chat-app/datachatapp/chat-with-data:latest \
     --region=australia-southeast1 \
-    --service-account=langchain-app-cr@langchain-chat.iam.gserviceaccount.com \
+    --service-account=sa-chat-app-tutorial@datafy-chat-app.iam.gserviceaccount.com \
     --port=8000
 ```
 
