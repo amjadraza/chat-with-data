@@ -31,7 +31,7 @@ poetry shell
 
 ```bash
 
-streamlit run demo_apps/langchain_app.py 
+streamlit run demo_apps/main.py 
 ```
 
 Run App using Docker
