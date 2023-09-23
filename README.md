@@ -5,6 +5,7 @@
 An App to interact with Pandas Dataframes using Generative AI (LLMs). This app is built using `streamlit`
 as front end and using [`pandasai`](https://github.com/gventuri/pandas-ai) a higher level python wrapper to make dataframes conversational.
 
+[![A Quick Tutorial](chat_with_data_app.PNG)](https://youtu.be/WZKyMkSyVt0)
 
 ## 🔧 Features
 - Upload csv 📁(csv) and ask questions about the uploaded Data.
@@ -96,17 +97,23 @@ we are going to use `Dockerfile` to deploy the app using Google Cloud Run.
 - gcloud init
 - gcloud auth login 
 
-# YOUR_PROJECT_ID = "datafy-chat-app"
+YOUR_PROJECT_ID = "datafy-chat-app"
 
 - Create a project on GCP using below command
 
 `gcloud projects create datafy-chat-app --name="Chat App" --labels=type=workshop`
 
-gcloud config set project datafy-chat-app
+- Set the Project
 
-gcloud config set compute/zone australia-southeast1
+`gcloud config set project datafy-chat-app``
 
-gcloud config list compute/zone
+- Set the Region & Zone
+`gcloud config set compute/zone australia-southeast1``
+
+-List the available zones
+`gcloud config list compute/zone`
+
+>Make Sure to enable the Billings on Google Cloud Project using Console
 
 
 2. Enable Services for the Project Cloudbuild
@@ -190,12 +197,10 @@ You can try the app using below link
 
 ## 🚀 Upcoming Features
 
-- [ ] Add support for more models (e.g.HuggingFace, Azure.).
-- [ ] Adding Functionality of Plotting.
-- [ ] Some Generic insights on Uploaded Data (e.g Shape, head etc)
+- [x] Some Generic insights on Uploaded Data (e.g Shape, head etc)
 - [x] Adding Docker Support to run the App in Docker
 - [ ] Push Docker Image to DockerHub for Public use
-- [ ] Deploying App on Google App Engine
+- [x] Deploying App on Google Cloud Run
 
 ## Report Feedbacks
 
