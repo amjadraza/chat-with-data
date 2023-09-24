@@ -20,8 +20,6 @@ jupyterlab = "^4.0.3"
 langchain =  {extras = ["docarray"], version = "^0.0.294"}
 hnswlib = "^0.7.0"
 
-
-
 [tool.poetry.group.dev.dependencies]
 python-dotenv = "^1.0.0"
 pytest = "^7.2.1"
