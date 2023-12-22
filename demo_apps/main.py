@@ -2,14 +2,14 @@
 # from langchain.llms import OpenAI
 from pandasai import SmartDataframe
 from pandasai.llm import OpenAI
-from pandasai.callbacks import StdoutCallback
+# from pandasai.callbacks import StdoutCallback
 from pandasai.llm import OpenAI
 import streamlit as st
 import pandas as pd
 import os
 
 from langchain.agents import AgentType
-from langchain.agents import create_pandas_dataframe_agent
+from langchain_experimental.agents.agent_toolkits.pandas.base import create_pandas_dataframe_agent
 from langchain.callbacks.streamlit import StreamlitCallbackHandler
 from langchain.chat_models import ChatOpenAI
 # from pandasai_app.components.faq import faq
@@ -18,31 +18,20 @@ def faq():
     st.markdown(
         """
 # FAQ
-## How does Pandasai App work?
-When you upload a cleaned CSV, it is converted into pandas dataframe. 
-Using OpenAI API, A python code is generated and run as per submitted query or 
-prompt.
+## What is this Application?
+This application helps users interact with SPICE analytics in a conversational way.
 
 
-## Is my data safe?
-Yes, your data is safe. Pandasai APp does not store your documents or
-questions or API Key. All uploaded data is deleted after you close the browser tab.
+## What sort of Data is Used?
+For a demo purpose, we have created a syntehtic Data with Events, Country and Engagaments. \n
+| Event | Country | Engagements | \n
 
-## What are the costs associated to using Openai API?
-Yes, there is cost associated when using Openai API. Please read the Pricing when signing up.
+## Example Questions
 
-## Does this App Supports Plots?
-This is Work In Progress.Yes, Plots will be supported in future.
+1. What is this Data About? 
+2. What are the number of engagements related to Gitex23 and India?
+3. 
 
-## Are the answers 100% accurate?
-No, the answers are not 100% accurate. Pandasai App uses the Openai API which tries to match answers close to 100%.
-As you are aware, this is still work in progress.
-
-## Support of Other APIs e.g Azure, HuggingFace, Dolly or Bard?
-This tool will be expanded to allow use of other LLMs API providers.
-
-## Support of Other APIs e.g Azure, HuggingFace, Dolly or Bard?
-This tool will be expanded to allow use of other LLMs API providers.
 
 """
     )
@@ -77,11 +66,11 @@ def load_data(uploaded_file):
         return None
 
 
-st.set_page_config(page_title="Chat-Data", page_icon="🦜|🐼")
-st.title("🐼 | 🦜 Chat with Data")
+st.set_page_config(page_title="Chat-Data-SPICA", page_icon="🦜|🐼")
+st.title("Demo SPICA| Interact with Insights About Topic")
 
 uploaded_file = st.file_uploader(
-    "Upload a Data file",
+    "Upload a Data file With Topic & Engagaments",
     type=list(file_formats.keys()),
     help="Various File formats are Support",
     on_change=clear_submit,
@@ -90,41 +79,44 @@ uploaded_file = st.file_uploader(
 if uploaded_file:
     df = load_data(uploaded_file)
 
-openai_api_key = st.sidebar.text_input("OpenAI API Key",
-                                        type="password",
-                                        placeholder="Paste your OpenAI API key here (sk-...)")
+# openai_api_key = st.sidebar.text_input("OpenAI API Key",
+#                                         type="password",
+#                                         placeholder="Paste your OpenAI API key here (sk-...)")
 
-chat_data = st.sidebar.selectbox("Choose a Backend", ['pandasai', 'langchain'])
+openai_api_key = "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"
+
+
+chat_data = st.sidebar.selectbox("Choose a Backend", ['langchain', 'pandasai'])
 
 with st.sidebar:
-        st.markdown("---")
-        st.markdown(
-            "## How to use\n"
-            "1. Enter your [OpenAI API key](https://platform.openai.com/account/api-keys) below🔑\n"  # noqa: E501
-            "2. Choose Backend PandasAI or LangChain\n"
-            "3. Upload a csv file with data📄\n"
-            "4. A csv file is read as Pandas Dataframe📄\n"
-            "5. Ask a question about to make dataframe conversational💬\n"
-        )
+#         st.markdown("---")
+#         st.markdown(
+#             "## How to use\n"
+#             "1. Enter your [OpenAI API key](https://platform.openai.com/account/api-keys) below🔑\n"  # noqa: E501
+#             "2. Choose Backend PandasAI or LangChain\n"
+#             "3. Upload a csv file with data📄\n"
+#             "4. A csv file is read as Pandas Dataframe📄\n"
+#             "5. Ask a question about to make dataframe conversational💬\n"
+#         )
 
-        st.markdown("---")
-        st.markdown("# About")
-        st.markdown(
-            "📖Pandasai App allows you to ask questions about your "
-            "csv / dataframe and get accurate answers"
-        )
-        st.markdown(
-            "Pandasai is in active development so is this tool."
-            "You can contribute to the project on [GitHub]() "  # noqa: E501
-            "with your feedback and suggestions💡"
-        )
-        st.markdown("Made by [DR. AMJAD RAZA](https://www.linkedin.com/in/amjadraza/)")
-        st.markdown("---")
+#         st.markdown("---")
+#         st.markdown("# About")
+#         st.markdown(
+#             "📖Pandasai App allows you to ask questions about your "
+#             "csv / dataframe and get accurate answers"
+#         )
+#         st.markdown(
+#             "Pandasai is in active development so is this tool."
+#             "You can contribute to the project on [GitHub]() "  # noqa: E501
+#             "with your feedback and suggestions💡"
+#         )
+#         st.markdown("Made by [DR. AMJAD RAZA](https://www.linkedin.com/in/amjadraza/)")
+#         st.markdown("---")
 
         faq()
 
 if "messages" not in st.session_state or st.sidebar.button("Clear conversation history"):
-    st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
+    st.session_state["messages"] = [{"role": "assistant", "content": "Welcome to Spice Analytics, Ask me?"}]
 
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
@@ -144,7 +136,7 @@ if prompt := st.chat_input(placeholder="What is this data about?"):
         sdf = SmartDataframe(df, config = {"llm": llm,
                                             "enable_cache": False,
                                             "conversational": True,
-                                            "callback": StdoutCallback()})
+                                            "verbose": True})
 
         with st.chat_message("assistant"):
             response = sdf.chat(st.session_state.messages)
