@@ -2,14 +2,14 @@
 # from langchain.llms import OpenAI
 from pandasai import SmartDataframe
 from pandasai.llm import OpenAI
-from pandasai.callbacks import StdoutCallback
+# from pandasai.callbacks import StdoutCallback
 from pandasai.llm import OpenAI
 import streamlit as st
 import pandas as pd
 import os
 
 from langchain.agents import AgentType
-from langchain.agents import create_pandas_dataframe_agent
+from langchain_experimental.agents.agent_toolkits.pandas.base import create_pandas_dataframe_agent
 from langchain.callbacks.streamlit import StreamlitCallbackHandler
 from langchain.chat_models import ChatOpenAI
 # from pandasai_app.components.faq import faq
@@ -144,7 +144,7 @@ if prompt := st.chat_input(placeholder="What is this data about?"):
         sdf = SmartDataframe(df, config = {"llm": llm,
                                             "enable_cache": False,
                                             "conversational": True,
-                                            "callback": StdoutCallback()})
+                                            })
 
         with st.chat_message("assistant"):
             response = sdf.chat(st.session_state.messages)

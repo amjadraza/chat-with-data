@@ -1,5 +1,5 @@
 <h1 align="center">
-📖Chat with Data
+📖Chat with Data: Demo fro SPICE MEDIA
 </h1>
 
 An App to interact with Pandas Dataframes using Generative AI (LLMs). This app is built using `streamlit`
